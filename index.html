@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulacro Complexivo II — Contabilidad y Auditoría</title>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0D12;
+  --s1:#0F111A;
+  --s2:#141720;
+  --card:#181C28;
+  --border:#222636;
+  --border2:#2C3248;
+  --c:#6366F1;  --cd:rgba(99,102,241,0.1);
+  --t:#EC4899;  --td:rgba(236,72,153,0.1);
+  --af:#06B6D4; --afd:rgba(6,182,212,0.1);
+  --ag:#F97316; --agd:rgba(249,115,22,0.1);
+  --ok:#22C55E; --okd:rgba(34,197,94,0.09);
+  --err:#F43F5E; --errd:rgba(244,63,94,0.09);
+  --text:#DDE4F5;
+  --muted:#4B5470;
+  --muted2:#6E7A9F;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Epilogue',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse 100% 60% at 20% -20%,rgba(99,102,241,0.06) 0%,transparent 55%),
+    radial-gradient(ellipse 80% 50% at 85% 110%,rgba(249,115,22,0.04) 0%,transparent 55%);
+}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ═══ WELCOME ═══ */
+#sw{align-items:center;justify-content:center;padding:52px 24px;text-align:center;position:relative;}
+.w-ver{
+  font-size:0.65rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;
+  background:var(--s2);border:1px solid var(--border2);color:var(--muted2);
+  padding:5px 18px;border-radius:20px;display:inline-block;margin-bottom:20px;
+}
+.w-title{
+  font-family:'Source Serif 4',serif;
+  font-size:clamp(2.4rem,5.5vw,4.2rem);
+  font-weight:700;line-height:1.08;
+  letter-spacing:-0.025em;margin-bottom:10px;
+}
+.w-title .v2{
+  background:linear-gradient(135deg,var(--t),var(--c));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.w-note{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);
+  color:var(--ok);font-size:0.78rem;font-weight:600;
+  padding:7px 16px;border-radius:6px;margin-bottom:28px;
+}
+.w-sub{font-size:0.93rem;color:var(--muted2);max-width:540px;margin:0 auto 40px;line-height:1.78;}
+
+.blk-row{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:14px;max-width:700px;width:100%;margin:0 auto 36px;
+}
+.bk{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:18px 20px;text-align:left;
+  position:relative;overflow:hidden;
+}
+.bk::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.bk.c::before{background:linear-gradient(90deg,var(--c),transparent);}
+.bk.t::before{background:linear-gradient(90deg,var(--t),transparent);}
+.bk.af::before{background:linear-gradient(90deg,var(--af),transparent);}
+.bk.ag::before{background:linear-gradient(90deg,var(--ag),transparent);}
+.bk-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.bk-ic{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.bk.c .bk-ic{background:var(--cd);}.bk.t .bk-ic{background:var(--td);}
+.bk.af .bk-ic{background:var(--afd);}.bk.ag .bk-ic{background:var(--agd);}
+.bk-tag{font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;}
+.bk.c .bk-tag{color:var(--c);}.bk.t .bk-tag{color:var(--t);}
+.bk.af .bk-tag{color:var(--af);}.bk.ag .bk-tag{color:var(--ag);}
+.bk-n{font-family:'Source Serif 4',serif;font-size:1.8rem;font-weight:700;line-height:1;margin-bottom:3px;}
+.bk-name{font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;}
+.bk-desc{font-size:0.7rem;color:var(--muted2);line-height:1.5;}
+
+.w-bar{
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  padding:14px 28px;display:flex;gap:32px;justify-content:center;
+  max-width:520px;width:100%;margin:0 auto 38px;flex-wrap:wrap;
+}
+.wb-i{text-align:center;}
+.wb-v{font-family:'Source Serif 4',serif;font-size:1.5rem;color:var(--text);}
+.wb-l{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+
+.btn-go{
+  font-family:'Epilogue',sans-serif;font-weight:800;font-size:0.88rem;
+  letter-spacing:0.1em;text-transform:uppercase;
+  color:#fff;background:linear-gradient(135deg,var(--t),var(--c));
+  border:none;padding:16px 54px;border-radius:8px;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 8px 32px rgba(99,102,241,0.25);
+}
+.btn-go:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(99,102,241,0.35);}
+
+/* ═══ EXAM HEADER ═══ */
+.eh{
+  background:var(--s1);border-bottom:1px solid var(--border);
+  padding:10px 22px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;gap:14px;
+}
+.eh-brand{
+  font-family:'Source Serif 4',serif;font-size:0.9rem;
+  color:var(--muted2);white-space:nowrap;font-style:italic;
+}
+.btabs{display:flex;gap:5px;}
+.btt{
+  font-size:0.6rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;
+  padding:5px 11px;border-radius:5px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;
+  font-family:'Epilogue',sans-serif;
+}
+.btt.c.on{background:var(--cd);border-color:rgba(99,102,241,0.4);color:var(--c);}
+.btt.t.on{background:var(--td);border-color:rgba(236,72,153,0.4);color:var(--t);}
+.btt.af.on{background:var(--afd);border-color:rgba(6,182,212,0.4);color:var(--af);}
+.btt.ag.on{background:var(--agd);border-color:rgba(249,115,22,0.4);color:var(--ag);}
+.btt:hover{border-color:var(--border2);color:var(--text);}
+.pa{flex:1;max-width:320px;}
+.pt{display:flex;justify-content:space-between;font-size:0.62rem;color:var(--muted);margin-bottom:4px;}
+.ptrk{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.pfil{height:100%;border-radius:2px;transition:width 0.4s;width:0%;
+  background:linear-gradient(90deg,var(--t),var(--c));}
+.tmr{
+  font-family:'Source Serif 4',serif;font-size:1.2rem;font-weight:700;
+  background:var(--s2);border:1px solid var(--border);border-radius:6px;
+  padding:6px 14px;min-width:88px;text-align:center;transition:all 0.3s;
+}
+.tmr.warn{border-color:var(--ag);color:var(--ag);}
+.tmr.danger{border-color:var(--err);color:var(--err);animation:bk 1s infinite;}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* ═══ EXAM BODY ═══ */
+.eb{display:flex;max-width:1200px;margin:0 auto;padding:24px 20px;gap:22px;align-items:flex-start;}
+
+.sn{
+  width:220px;flex-shrink:0;background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:16px;position:sticky;top:66px;
+  max-height:calc(100vh - 86px);overflow-y:auto;
+}
+.sn-blk{margin-bottom:16px;}
+.sn-lbl{
+  font-size:0.58rem;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;
+  padding:4px 8px;border-radius:3px;margin-bottom:8px;display:inline-block;
+}
+.sn-lbl.c{background:var(--cd);color:var(--c);}
+.sn-lbl.t{background:var(--td);color:var(--t);}
+.sn-lbl.af{background:var(--afd);color:var(--af);}
+.sn-lbl.ag{background:var(--agd);color:var(--ag);}
+.ng{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;}
+.nd{
+  aspect-ratio:1;border-radius:4px;border:1px solid var(--border);
+  background:var(--s2);color:var(--muted);
+  font-size:0.6rem;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.12s;font-family:'Epilogue',sans-serif;
+}
+.nd:hover{border-color:var(--border2);color:var(--text);}
+.nd.done.c{background:var(--cd);border-color:rgba(99,102,241,0.4);color:var(--c);}
+.nd.done.t{background:var(--td);border-color:rgba(236,72,153,0.4);color:var(--t);}
+.nd.done.af{background:var(--afd);border-color:rgba(6,182,212,0.4);color:var(--af);}
+.nd.done.ag{background:var(--agd);border-color:rgba(249,115,22,0.4);color:var(--ag);}
+.nd.now{color:#0B0D12!important;}
+.nd.now.c{background:var(--c)!important;border-color:var(--c)!important;}
+.nd.now.t{background:var(--t)!important;border-color:var(--t)!important;}
+.nd.now.af{background:var(--af)!important;border-color:var(--af)!important;}
+.nd.now.ag{background:var(--ag)!important;border-color:var(--ag)!important;}
+
+/* Question */
+.qw{flex:1;min-width:0;}
+.bb2{
+  display:flex;align-items:center;gap:12px;padding:10px 16px;
+  border-radius:6px;margin-bottom:16px;font-size:0.72rem;font-weight:800;
+  letter-spacing:0.08em;text-transform:uppercase;border:1px solid;
+}
+.bb2.c{background:var(--cd);border-color:rgba(99,102,241,0.25);color:var(--c);}
+.bb2.t{background:var(--td);border-color:rgba(236,72,153,0.25);color:var(--t);}
+.bb2.af{background:var(--afd);border-color:rgba(6,182,212,0.25);color:var(--af);}
+.bb2.ag{background:var(--agd);border-color:rgba(249,115,22,0.25);color:var(--ag);}
+.bb-r{margin-left:auto;font-size:0.62rem;opacity:0.75;}
+
+.qc{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:32px 36px;margin-bottom:18px;
+  animation:fu 0.25s ease;position:relative;overflow:hidden;
+}
+.qc::after{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;}
+.qc.c::after{background:var(--c);}.qc.t::after{background:var(--t);}
+.qc.af::after{background:var(--af);}.qc.ag::after{background:var(--ag);}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.qt{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
+.qtg{display:flex;gap:7px;flex-wrap:wrap;}
+.tg{
+  font-size:0.6rem;font-weight:800;letter-spacing:0.09em;text-transform:uppercase;
+  padding:4px 10px;border-radius:4px;border:1px solid;
+}
+.tg.num{background:var(--s2);border-color:var(--border2);color:var(--muted2);}
+.tg.nrm{background:rgba(236,72,153,0.08);border-color:rgba(236,72,153,0.25);color:var(--t);}
+.tg.tpc{background:var(--s2);border-color:var(--border);color:var(--muted);}
+.tg.trm{background:rgba(244,63,94,0.08);border-color:rgba(244,63,94,0.25);color:var(--err);}
+.tg.dif{background:rgba(244,63,94,0.06);border-color:rgba(244,63,94,0.2);color:var(--err);}
+.tg.ca{background:rgba(6,182,212,0.08);border-color:rgba(6,182,212,0.25);color:var(--af);}
+
+.qtext{
+  font-family:'Source Serif 4',serif;font-size:1.02rem;font-weight:600;
+  line-height:1.74;color:var(--text);margin-bottom:26px;
+}
+.qcase{
+  background:var(--s2);border:1px solid var(--border2);border-radius:6px;
+  padding:14px 18px;margin-bottom:22px;
+  font-size:0.87rem;line-height:1.7;color:var(--muted2);
+  border-left:3px solid var(--border2);font-style:italic;
+}
+.qcase b{color:var(--text);font-style:normal;}
+
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt{
+  display:flex;align-items:flex-start;gap:13px;
+  padding:13px 16px;border-radius:7px;border:1px solid var(--border);
+  cursor:pointer;transition:all 0.12s;background:var(--s2);
+  font-size:0.89rem;line-height:1.55;user-select:none;
+}
+.opt:hover{border-color:var(--border2);background:rgba(255,255,255,0.02);}
+.opt.sel{border-color:var(--c);background:var(--cd);}
+.opt.sel .ol{background:var(--c);color:#fff;border-color:var(--c);}
+.opt.ok{border-color:var(--ok)!important;background:var(--okd)!important;}
+.opt.ok .ol{background:var(--ok)!important;color:#fff!important;}
+.opt.err{border-color:var(--err)!important;background:var(--errd)!important;}
+.opt.err .ol{background:var(--err)!important;color:#fff!important;}
+.ol{
+  width:28px;height:28px;border-radius:5px;background:var(--border);
+  border:1px solid var(--border2);color:var(--muted2);
+  font-size:0.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;transition:all 0.12s;
+}
+
+.fb{
+  margin-top:16px;padding:16px 20px;border-radius:7px;
+  font-size:0.875rem;line-height:1.74;display:none;
+}
+.fb.show{display:block;}
+.fb.ok{background:var(--okd);border-left:3px solid var(--ok);color:#BBF7D0;}
+.fb.err{background:var(--errd);border-left:3px solid var(--err);color:#FCA5A5;}
+.cite{
+  display:inline-block;margin-top:10px;
+  font-size:0.72rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;
+  color:var(--t);background:var(--td);border:1px solid rgba(236,72,153,0.3);
+  padding:4px 12px;border-radius:4px;
+}
+
+.ctrl{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.bn{
+  font-family:'Epilogue',sans-serif;font-size:0.75rem;font-weight:700;
+  letter-spacing:0.07em;text-transform:uppercase;
+  padding:10px 20px;border-radius:6px;border:1px solid var(--border);
+  background:var(--s2);color:var(--muted2);cursor:pointer;transition:all 0.12s;
+}
+.bn:hover{border-color:var(--border2);color:var(--text);}
+.bn:disabled{opacity:0.2;cursor:default;}
+.bfin{
+  font-family:'Epilogue',sans-serif;font-size:0.82rem;font-weight:800;
+  letter-spacing:0.09em;text-transform:uppercase;
+  padding:11px 28px;border-radius:6px;border:none;
+  background:linear-gradient(135deg,var(--t),var(--c));
+  color:#fff;cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(99,102,241,0.25);
+}
+.bfin:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,0.35);}
+
+/* ═══ RESULTS ═══ */
+#sr{padding:56px 24px 80px;align-items:center;background:var(--bg);}
+.rw{max-width:920px;width:100%;margin:0 auto;}
+.rh{text-align:center;margin-bottom:44px;}
+.rey{
+  font-size:0.65rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+}
+.rey::before,.rey::after{content:'';width:40px;height:1px;background:var(--border2);}
+.rtt{
+  font-family:'Source Serif 4',serif;
+  font-size:clamp(2rem,5vw,3.4rem);font-weight:700;letter-spacing:-0.02em;
+}
+.rtt .hi{
+  background:linear-gradient(135deg,var(--t),var(--c));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.ov-row{display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap;margin-bottom:44px;}
+.sr2{position:relative;width:160px;height:160px;}
+.sr2 svg{transform:rotate(-90deg);}
+.sg{fill:none;stroke:var(--border);stroke-width:10;}
+.sf{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.3,1);}
+.si{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.sp{font-family:'Source Serif 4',serif;font-size:2.4rem;font-weight:700;line-height:1;}
+.sl{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+
+.ov-s{display:flex;flex-direction:column;gap:12px;}
+.os{display:flex;align-items:center;gap:14px;font-size:0.72rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;}
+.ob{width:150px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.obar{height:100%;border-radius:3px;transition:width 1s ease;width:0%;}
+.ov2{min-width:28px;text-align:right;font-family:'Source Serif 4',serif;font-size:1.1rem;}
+
+.bsc{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:40px;}
+.bscard{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 22px;position:relative;overflow:hidden;}
+.bscard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.bscard.c::before{background:var(--c);}.bscard.t::before{background:var(--t);}
+.bscard.af::before{background:var(--af);}.bscard.ag::before{background:var(--ag);}
+.bst{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.bsn{font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;}
+.bscard.c .bsn{color:var(--c);}.bscard.t .bsn{color:var(--t);}
+.bscard.af .bsn{color:var(--af);}.bscard.ag .bsn{color:var(--ag);}
+.bsp{font-family:'Source Serif 4',serif;font-size:1.8rem;font-weight:700;line-height:1;}
+.bsb{height:5px;background:var(--s2);border-radius:3px;overflow:hidden;margin-bottom:8px;}
+.bsbar{height:100%;border-radius:3px;transition:width 1.2s ease;width:0%;}
+.bsd{font-size:0.7rem;color:var(--muted2);}
+
+.rvhd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.rvtt{font-family:'Source Serif 4',serif;font-size:1.5rem;font-weight:700;}
+.fg{display:flex;gap:7px;flex-wrap:wrap;}
+.fbb{
+  font-family:'Epilogue',sans-serif;font-size:0.63rem;font-weight:700;
+  letter-spacing:0.1em;text-transform:uppercase;
+  padding:6px 13px;border-radius:5px;border:1px solid var(--border);
+  background:transparent;color:var(--muted2);cursor:pointer;transition:all 0.12s;
+}
+.fbb.on{border-color:var(--c);color:var(--c);background:var(--cd);}
+.fbb.on.t{border-color:var(--t);color:var(--t);background:var(--td);}
+.fbb.on.af{border-color:var(--af);color:var(--af);background:var(--afd);}
+.fbb.on.ag{border-color:var(--ag);color:var(--ag);background:var(--agd);}
+.fbb:hover{border-color:var(--border2);color:var(--text);}
+
+.rcard{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 24px;margin-bottom:12px;position:relative;overflow:hidden;}
+.rcard::after{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;}
+.rcard.ok::after{background:var(--ok);}.rcard.bad::after{background:var(--err);}
+.rcard.gone{display:none;}
+.rm{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.rn{font-size:0.6rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.rbadge{font-size:0.6rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:2px 10px;border-radius:4px;}
+.rbadge.ok{background:var(--okd);color:var(--ok);border:1px solid rgba(34,197,94,0.25);}
+.rbadge.bad{background:var(--errd);color:var(--err);border:1px solid rgba(244,63,94,0.25);}
+.rq{font-family:'Source Serif 4',serif;font-size:0.95rem;font-weight:600;line-height:1.62;margin-bottom:14px;color:var(--text);}
+.rcase{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:var(--muted2);font-style:italic;border-left:3px solid var(--border2);line-height:1.6;}
+.ropts{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.ropt{padding:8px 12px;border-radius:5px;font-size:0.82rem;display:flex;gap:9px;}
+.ropt.ok{background:var(--okd);color:#BBF7D0;}.ropt.bad{background:var(--errd);color:#FCA5A5;}.ropt.dim{color:var(--muted2);}
+.rl{font-weight:800;flex-shrink:0;font-size:0.72rem;}
+.rex{padding:14px 18px;background:var(--s2);border-radius:6px;font-size:0.83rem;color:var(--muted2);line-height:1.74;border-left:3px solid var(--t);}
+.rex strong{color:var(--t);}
+.nc{display:inline-block;margin-top:10px;font-size:0.7rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:var(--t);background:var(--td);border:1px solid rgba(236,72,153,0.3);padding:4px 12px;border-radius:4px;}
+
+.ract{display:flex;justify-content:center;gap:14px;margin-top:48px;padding-top:28px;border-top:1px solid var(--border);}
+.brt{font-family:'Epilogue',sans-serif;font-weight:800;font-size:0.88rem;letter-spacing:0.09em;text-transform:uppercase;padding:13px 36px;border-radius:7px;border:1px solid var(--c);background:transparent;color:var(--c);cursor:pointer;transition:all 0.2s;}
+.brt:hover{background:var(--cd);transform:translateY(-1px);}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.82);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(6px);}
+.modal-bg.on{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:40px;max-width:420px;width:90%;text-align:center;animation:fu 0.2s;}
+.modal h2{font-family:'Source Serif 4',serif;font-size:1.6rem;margin-bottom:10px;}
+.modal p{font-size:0.84rem;color:var(--muted2);line-height:1.7;margin-bottom:28px;}
+.mrow{display:flex;gap:12px;justify-content:center;}
+.bmc{font-family:'Epilogue',sans-serif;font-size:0.78rem;font-weight:700;padding:10px 22px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;transition:all 0.12s;}
+.bmo{font-family:'Epilogue',sans-serif;font-size:0.82rem;font-weight:800;padding:10px 26px;border-radius:6px;border:none;background:linear-gradient(135deg,var(--t),var(--c));color:#fff;cursor:pointer;transition:all 0.2s;}
+.bmo:hover{transform:translateY(-1px);}
+
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+@media(max-width:768px){.sn{display:none;}.eb{padding:14px;}.qc{padding:20px;}.blk-row{grid-template-columns:1fr;}.bsc{grid-template-columns:1fr;}.btabs{display:none;}.ov-row{flex-direction:column;gap:24px;}}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="sw" class="screen active">
+  <div class="w-ver">Versión 2 · Banco de Preguntas Alternativo</div>
+  <h1 class="w-title"><span class="v2">Complexivo II</span><br>Contabilidad & Auditoría</h1>
+  <div class="w-note">✓ Preguntas completamente reformuladas · Sin repetición con la Versión 1</div>
+  <p class="w-sub">Segunda batería de 50 preguntas. Mismos bloques y normativas, formulación diferente con mayor enfoque conceptual y preguntas tipo "trampa" técnica en todos los módulos.</p>
+  <div class="blk-row">
+    <div class="bk c"><div class="bk-hd"><div class="bk-ic">📊</div><div class="bk-tag">Bloque I</div></div><div class="bk-n">12</div><div class="bk-name">Contabilidad Financiera</div><div class="bk-desc">NIC 2 · NIC 16 · NIC 41 · NIIF 9 · NIC 23 — Énfasis conceptual y de principios, mínimo casos prácticos</div></div>
+    <div class="bk t"><div class="bk-hd"><div class="bk-ic">⚖️</div><div class="bk-tag">Bloque II</div></div><div class="bk-n">13</div><div class="bk-name">Tributación Ecuador</div><div class="bk-desc">LORTI · RLORTI — Deducibilidad, retenciones, conciliación, sujetos pasivos</div></div>
+    <div class="bk af"><div class="bk-hd"><div class="bk-ic">🔍</div><div class="bk-tag">Bloque III</div></div><div class="bk-n">13</div><div class="bk-name">Auditoría Financiera</div><div class="bk-desc">NIA · COSO · ISO 31000 — Fases, evidencia, informes, riesgos</div></div>
+    <div class="bk ag"><div class="bk-hd"><div class="bk-ic">📋</div><div class="bk-tag">Bloque IV</div></div><div class="bk-n">12</div><div class="bk-name">Auditoría de Gestión</div><div class="bk-desc">CGE — Fases 1, 2 y 3, indicadores, hallazgos, informes</div></div>
+  </div>
+  <div class="w-bar">
+    <div class="wb-i"><div class="wb-v">50</div><div class="wb-l">Preguntas</div></div>
+    <div class="wb-i"><div class="wb-v">75<span style="font-size:1rem">m</span></div><div class="wb-l">Tiempo</div></div>
+    <div class="wb-i"><div class="wb-v">70%</div><div class="wb-l">Mínimo</div></div>
+    <div class="wb-i"><div class="wb-v">★★★</div><div class="wb-l">Nivel</div></div>
+  </div>
+  <button class="btn-go" onclick="startExam()">INICIAR EXAMEN →</button>
+</div>
+
+<!-- EXAM -->
+<div id="se" class="screen">
+  <header class="eh">
+    <div class="eh-brand">Complexivo II</div>
+    <div class="btabs">
+      <button class="btt c" id="tab-c" onclick="jb(0)">I · Contabilidad</button>
+      <button class="btt t" id="tab-t" onclick="jb(12)">II · Tributación</button>
+      <button class="btt af" id="tab-af" onclick="jb(25)">III · Aud. Fin.</button>
+      <button class="btt ag" id="tab-ag" onclick="jb(38)">IV · Aud. Gest.</button>
+    </div>
+    <div class="pa">
+      <div class="pt"><span id="plbl">P.1/50</span><span id="pcnt">0 resp.</span></div>
+      <div class="ptrk"><div class="pfil" id="pfil"></div></div>
+    </div>
+    <div class="tmr" id="tmr"><span id="ttxt">75:00</span></div>
+  </header>
+  <div class="eb">
+    <aside class="sn" id="sn"></aside>
+    <div class="qw">
+      <div class="bb2" id="bb2"></div>
+      <div class="qc" id="qc">
+        <div class="qt">
+          <div class="qtg">
+            <span class="tg num" id="t1">P.01</span>
+            <span class="tg nrm" id="t2"></span>
+            <span class="tg tpc" id="t3"></span>
+            <span class="tg trm" id="t4" style="display:none">⚠ Trampa técnica</span>
+            <span class="tg ca" id="t5" style="display:none">📋 Caso</span>
+          </div>
+          <span class="tg dif">★★★ Alto</span>
+        </div>
+        <div class="qcase" id="qcase" style="display:none"></div>
+        <div class="qtext" id="qtext"></div>
+        <div class="opts" id="opts"></div>
+        <div class="fb" id="fb"></div>
+      </div>
+      <div class="ctrl">
+        <button class="bn" id="bp" onclick="nav(-1)" disabled>← Anterior</button>
+        <button class="bfin" onclick="askEnd()">Finalizar Examen</button>
+        <button class="bn" id="bn2" onclick="nav(1)">Siguiente →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="sr" class="screen">
+  <div class="rw">
+    <div class="rh">
+      <div class="rey">Resultado Final · Versión 2</div>
+      <h1 class="rtt" id="rtt">Examen <span class="hi">Finalizado</span></h1>
+    </div>
+    <div class="ov-row">
+      <div class="sr2">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <circle class="sg" cx="80" cy="80" r="70"/>
+          <circle class="sf" id="sfg" cx="80" cy="80" r="70" stroke-dasharray="439.82" stroke-dashoffset="439.82"/>
+        </svg>
+        <div class="si"><div class="sp" id="spc">—</div><div class="sl" id="slbl">Global</div></div>
+      </div>
+      <div class="ov-s">
+        <div class="os"><span style="color:var(--ok);min-width:90px">CORRECTAS</span><div class="ob"><div class="obar" id="obc" style="background:var(--ok)"></div></div><span class="ov2" style="color:var(--ok)" id="ovc">0</span></div>
+        <div class="os"><span style="color:var(--err);min-width:90px">INCORRECTAS</span><div class="ob"><div class="obar" id="obw" style="background:var(--err)"></div></div><span class="ov2" style="color:var(--err)" id="ovw">0</span></div>
+        <div class="os"><span style="color:var(--muted2);min-width:90px">SIN RESP.</span><div class="ob"><div class="obar" id="obb" style="background:var(--muted)"></div></div><span class="ov2" style="color:var(--muted2)" id="ovb">0</span></div>
+        <div style="margin-top:10px;padding-top:12px;border-top:1px solid var(--border);max-width:300px;"><div id="rmsg" style="font-size:0.84rem;color:var(--muted2);line-height:1.7;"></div></div>
+      </div>
+    </div>
+    <div class="bsc" id="bsc"></div>
+    <div class="rvhd">
+      <div class="rvtt">Retroalimentación</div>
+      <div class="fg">
+        <button class="fbb on" onclick="flt('all',this)">Todas</button>
+        <button class="fbb" onclick="flt('bad',this)">Errores</button>
+        <button class="fbb" onclick="flt('ok',this)">Correctas</button>
+        <button class="fbb" onclick="flt('c',this)">Contabilidad</button>
+        <button class="fbb" onclick="flt('t',this)">Tributación</button>
+        <button class="fbb" onclick="flt('af',this)">Aud. Fin.</button>
+        <button class="fbb" onclick="flt('ag',this)">Aud. Gest.</button>
+      </div>
+    </div>
+    <div id="rvlist"></div>
+    <div class="ract"><button class="brt" onclick="restart()">↺ Reintentar</button></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="mbg">
+  <div class="modal">
+    <h2>¿Finalizar?</h2>
+    <p id="mp">¿Confirmas finalizar el examen?</p>
+    <div class="mrow"><button class="bmc" onclick="cm()">Cancelar</button><button class="bmo" onclick="doFin()">Finalizar</button></div>
+  </div>
+</div>
+
+<script>
+const QS=[
+// ══════════════════════════════════════════════════════════
+// BLOQUE I — CONTABILIDAD FINANCIERA (12 Q)
+// Reformuladas: conceptuales, comparativas y de principios
+// ══════════════════════════════════════════════════════════
+{blk:'c',norm:'NIC 16',topic:'Reconocimiento — Criterios',trap:true,
+q:'Una empresa compra terrenos con la intención de construir una bodega en el futuro. Al cierre del ejercicio, el terreno no ha sido utilizado y la construcción no ha comenzado. Según la NIC 16, ¿cuál afirmación es CORRECTA?',
+o:['El terreno no puede reconocerse como PPE porque aún no genera ingresos','El terreno se reconoce como PPE si se espera usarlo para producción o administración, aunque aún no esté en uso activo. El reconocimiento no requiere uso actual','El terreno debe clasificarse como propiedad de inversión bajo NIC 40 por estar ocioso','El terreno se difiere como activo intangible hasta que inicie la construcción'],
+a:1,cite:'NIC 16, párrafo 7',
+ex:'Según NIC 16, párrafo 7: un elemento se reconoce como PPE cuando (a) es probable obtener beneficios económicos futuros y (b) el costo puede medirse con fiabilidad. La norma NO requiere que el activo esté en uso activo para reconocerse. El terreno adquirido para uso futuro califica como PPE. La NIC 40 aplica solo cuando se mantiene para obtener rentas o plusvalías, no para uso propio futuro. Este es un error muy común: confundir "disponible para uso" (que determina cuándo inicia depreciación) con el reconocimiento inicial del activo.'},
+
+{blk:'c',norm:'NIC 16',topic:'Componentes — Contabilización',trap:true,
+q:'Una empresa tiene un buque que costó $5.000.000. El motor principal (vida útil 8 años, costo $800.000) y el casco (vida útil 25 años) son identificables. La empresa decide depreciar el buque como un solo activo a 25 años. ¿Es esto correcto según la NIC 16?',
+o:['Sí, la empresa puede elegir libremente entre depreciar por componentes o como un todo','Sí, siempre que el importe del motor sea menor al 15% del costo total del buque','No, la NIC 16 REQUIERE que los componentes con costo significativo y vida útil diferente se deprecien por separado. El motor debe depreciarse en 8 años','No, pero solo porque el motor excede el 10% del costo total; de lo contrario, podría depreciarse como un todo'],
+a:2,cite:'NIC 16, párrafos 43-47',
+ex:'NIC 16, párrafo 43: CADA PARTE de un elemento de PPE con un costo que sea significativo en relación con el costo total del elemento DEBE depreciarse por separado. El motor ($800.000 / $5.000.000 = 16%) es significativo y tiene vida útil diferente (8 vs 25 años). Por tanto, la contabilización por componentes es OBLIGATORIA, no opcional. El error de depreciar como un todo subestima el gasto del período y sobrevalora el activo durante los primeros 8 años.'},
+
+{blk:'c',norm:'NIC 16',topic:'Modelo del Costo vs Revaluación',trap:false,
+q:'Una empresa aplica el modelo de revaluación a sus edificios. ¿Con qué frecuencia DEBE realizarse la revaluación según la NIC 16?',
+o:['Obligatoriamente cada año, al cierre de cada ejercicio','Cada 5 años, que es el período máximo permitido por la norma','Con suficiente regularidad para asegurar que el importe en libros no difiera significativamente del valor razonable a la fecha de balance. La frecuencia depende de la volatilidad del valor razonable del activo','Solo cuando la gerencia sospeche que el valor razonable difiere materialmente del importe en libros'],
+a:2,cite:'NIC 16, párrafo 31',
+ex:'NIC 16, párrafo 31: la norma no fija una frecuencia específica. Establece que las revaluaciones se harán con suficiente regularidad para que el importe en libros no difiera significativamente del valor razonable en la fecha de cierre. Para activos con valores razonables VOLÁTILES (terrenos en zonas de alto dinamismo inmobiliario), puede requerirse revaluación ANUAL. Para activos estables, cada 3-5 años puede ser suficiente. La clave es la volatilidad del VR, no un calendario fijo.'},
+
+{blk:'c',norm:'NIC 2',topic:'Fórmulas de Costo — LIFO',trap:true,
+q:'Un estudiante afirma que para efectos contables bajo NIIF, una empresa puede usar LIFO (último en entrar, primero en salir) si es el método que mejor refleja el flujo físico de sus inventarios. ¿Es correcta esta afirmación?',
+o:['Sí, si el flujo físico real de los inventarios es LIFO, la norma permite su uso por el principio de sustancia sobre forma','Sí, pero solo para empresas del sector minero y energético donde el flujo LIFO es físicamente inevitable','No, la NIC 2 revisada eliminó el LIFO como método permitido en 2003. Solo se permiten FIFO y Costo Promedio Ponderado para inventarios intercambiables','No, pero el método puede seguirse usando si ya estaba adoptado antes de 2005'],
+a:2,cite:'NIC 2, párrafos 25-27',
+ex:'NIC 2, párrafo 25 (revisión 2003): la norma ELIMINÓ el método LIFO como tratamiento alternativo permitido. Las únicas fórmulas de costo aceptadas para inventarios intercambiables son: (1) FIFO (primera entrada, primera salida) y (2) Costo Promedio Ponderado. El argumento del flujo físico no es válido: la norma no permite LIFO bajo ninguna circunstancia desde su revisión. Esta es una "trampa" clásica en exámenes ya que muchas empresas en otros marcos contables (US GAAP) aún usan LIFO.'},
+
+{blk:'c',norm:'NIC 2',topic:'VNR — Reversión',trap:false,
+q:'En el ejercicio 20X1, una empresa rebajó inventarios de $100.000 a VNR $80.000 reconociendo una pérdida de $20.000. En 20X2, el VNR se recuperó a $95.000. ¿Cuál es el tratamiento correcto en 20X2?',
+o:['No se puede revertir ningún deterioro de inventario; permanece en $80.000','Se revierte hasta $95.000, reconociendo una ganancia de $15.000 que lleva el inventario por encima del costo original','Se revierte solo hasta el costo original ($100.000), reconociendo una ganancia de $20.000 — ERROR: el VNR revisado es $95.000, así que la reversión máxima es $15.000 llevando el inventario a $95.000','Se revierte el 100% y el inventario sube a $95.000, reconociendo una ganancia de $15.000 en el resultado del período'],
+a:3,cite:'NIC 2, párrafos 33-34',
+ex:'NIC 2, párrafo 33: la reversión se reconoce en resultados, pero solo hasta el MENOR entre el costo original y el VNR revisado. Costo original = $100.000. VNR revisado = $95.000. El menor es $95.000. Por tanto: el inventario sube de $80.000 a $95.000, reconociendo una ganancia de $15.000 en el resultado del período. No puede subir a $100.000 porque el VNR actual es solo $95.000. La respuesta C es un distractor clásico que invierte el límite: el límite es el MENOR entre costo y VNR revisado, no el costo solo.'},
+
+{blk:'c',norm:'NIC 41',topic:'Ganancia en Reconocimiento Inicial',trap:true,
+q:'Una empresa ganadera tiene una vaca que da a luz un ternero. Al reconocer el ternero como activo biológico por primera vez, su valor razonable menos costos de venta es $800. ¿Dónde se reconoce esta ganancia de $800?',
+o:['No se reconoce ninguna ganancia; el ternero se registra a costo cero al nacer porque no hubo desembolso','En el estado de cambios en el patrimonio como reserva biológica','Como ganancia en el resultado del período en que nace (reconocimiento inicial)','Como ingreso diferido hasta que el ternero sea vendido o entre en producción'],
+a:2,cite:'NIC 41, párrafo 26',
+ex:'NIC 41, párrafo 26: TODA ganancia o pérdida surgida en el reconocimiento inicial de un activo biológico a valor razonable menos costos de venta SE RECONOCE EN EL RESULTADO DEL PERÍODO en que surja. El nacimiento de un ternero genera un ingreso de $800 en el período del nacimiento. No existe costo diferido ni reserva especial. Este principio es contraintuitivo para quienes vienen de la contabilidad de costos: el activo "nace" con un valor positivo que va directamente a resultados, lo cual es una característica única de la NIC 41.'},
+
+{blk:'c',norm:'NIC 41',topic:'Excepción al VR — Costo',trap:true,
+q:'¿Bajo qué condición específica permite la NIC 41 medir un activo biológico al COSTO menos depreciación menos deterioro, en lugar del valor razonable?',
+o:['Cuando la gerencia considera que el costo refleja mejor la situación financiera de la entidad','Cuando el activo biológico lleva más de 5 años en el balance sin haberse revaluado','Únicamente cuando en el reconocimiento inicial no pueden determinarse el valor razonable con fiabilidad porque no existen precios de mercado ni estimaciones alternativas confiables','Cuando el activo biológico tiene características únicas que lo diferencian del mercado estándar'],
+a:2,cite:'NIC 41, párrafo 30',
+ex:'NIC 41, párrafo 30: la presunción de que el VR puede medirse con fiabilidad SOLO puede refutarse en el RECONOCIMIENTO INICIAL, cuando los precios o valores de mercado no están disponibles Y las estimaciones alternativas de VR son claramente poco fiables. La excepción aplica en el inicio, no durante la vida del activo. Adicionalmente, párrafo 31 indica que si en períodos posteriores el VR puede medirse con fiabilidad, la entidad DEBE cambiar a la medición a VR. La elección discrecional de la gerencia nunca es el criterio; es la incapacidad técnica de determinar el VR.'},
+
+{blk:'c',norm:'NIIF 9',topic:'Reclasificación — Instrumentos de Patrimonio',trap:true,
+q:'Una empresa designó irrevocablemente acciones de una empresa cotizada a VRCORI (valor razonable con cambios en ORI). Al año siguiente, el precio de las acciones cae significativamente y la gerencia quiere reclasificarlas a VRRYG para reconocer la pérdida en resultados. ¿Es posible?',
+o:['Sí, el cambio adverso en valor razonable justifica la reclasificación por principio de prudencia','Sí, pero solo si las pérdidas acumuladas en ORI superan el 20% del costo original','No, la designación a VRCORI de instrumentos de patrimonio es IRREVOCABLE. Las pérdidas acumuladas en ORI NUNCA se reclasifican a resultados, ni siquiera al vender el activo','Sí, siempre que el cambio de modelo de negocio esté debidamente documentado y aprobado por el directorio'],
+a:2,cite:'NIIF 9, párrafos 5.7.5 y 5.7.7',
+ex:'NIIF 9, párrafo 5.7.5: la elección de presentar las variaciones de VR de instrumentos de patrimonio en ORI es IRREVOCABLE. No existe mecanismo para reclasificarlos a VRRYG posteriormente. Más importante: NIIF 9, párrafo 5.7.7 establece que cuando el instrumento es vendido o dado de baja, las ganancias/pérdidas acumuladas en ORI PUEDEN transferirse a resultados acumulados pero NO se "reciclan" a resultados del período. Esta es la diferencia clave con los instrumentos de deuda a VRCORI, donde las ganancias/pérdidas SÍ se reciclan al venderse.'},
+
+{blk:'c',norm:'NIIF 9',topic:'Prueba SPPI — Fallo',trap:true,
+q:'Un instrumento de deuda paga intereses cuya tasa varía según el índice de precios al consumidor (IPC/inflación). ¿Supera este instrumento la prueba SPPI de la NIIF 9?',
+o:['Sí, porque la tasa variable refleja el valor temporal del dinero al ajustarse por inflación','Sí, si la tasa piso es al menos el 0%','No, porque los flujos ligados a un índice de inflación general no son puramente pagos de principal e intereses que reflejen valor temporal del dinero y riesgo crediticio. La exposición al IPC introduce un componente de riesgo de commodities/económico que falla la prueba SPPI','Depende: si la tasa variable incluye un spread de crédito, sí supera SPPI; si no, no'],
+a:2,cite:'NIIF 9, párrafo B4.1.7A',
+ex:'NIIF 9, párrafo B4.1.7A y B4.1.15: los flujos de efectivo contractuales deben ser ÚNICAMENTE pagos de principal e intereses. Los intereses reflejan valor temporal del dinero y riesgo crediticio. Una tasa ligada al IPC introduce exposición a variaciones del nivel general de precios de la economía, que no es equivalente a riesgo crediticio ni valor temporal del dinero. Por tanto, el instrumento FALLA la prueba SPPI → se clasifica obligatoriamente a VRRYG, independientemente del modelo de negocio. La inflación como indexador rompe la pureza de los flujos.'},
+
+{blk:'c',norm:'NIC 23',topic:'Activo Apto — Inventarios',trap:true,
+q:'Una empresa destiladora produce whisky que requiere 12 años de maduración en barricas antes de venderse. El proceso es continuo y la empresa financia la producción con deuda general. ¿Puede capitalizar los costos por préstamos sobre esta producción?',
+o:['No, los inventarios nunca son activos aptos bajo NIC 23, sin excepción','No, porque el financiamiento es deuda general y no un préstamo específico para el whisky','Sí, el whisky en maduración es un inventario que requiere un período sustancial para estar listo para la venta, por lo que califica como activo apto. Los costos por préstamos de financiamiento general se capitalizan aplicando la tasa de capitalización al desembolso del activo apto','Solo si el período de maduración supera 15 años y así lo determina la política contable'],
+a:2,cite:'NIC 23, párrafos 4-7 y 14-15',
+ex:'NIC 23, párrafo 5: un activo apto es aquel que requiere necesariamente un período sustancial de tiempo para estar listo para su uso o venta. Párrafo 4 nota: los inventarios que se fabrican en cantidades repetitivas NO son activos aptos. Sin embargo, el whisky en maduración de 12 años es la excepción: no es producción repetitiva de corto ciclo. Califica como activo apto. Para deuda general, párrafo 14-15: la tasa de capitalización es el promedio ponderado de las tasas de deuda vigente, aplicada al desembolso realizado durante el período en el activo apto.'},
+
+{blk:'c',norm:'NIC 36',topic:'UGE — Asignación de Goodwill',trap:false,
+q:'¿Por qué el deterioro del goodwill (plusvalía) NO puede revertirse en períodos posteriores, a diferencia del deterioro de activos individuales?',
+o:['Porque el goodwill es un activo intangible y todos los intangibles tienen deterioro irreversible','Porque el goodwill no tiene VNR, solo valor en uso','Porque cualquier incremento en el importe recuperable de una UGE después de reconocer deterioro del goodwill probablemente se debe a generación interna de plusvalía, no a reversión del deterioro original. La NIC 36 prohíbe el reconocimiento de plusvalía generada internamente','Porque el goodwill no está asignado a ninguna UGE y por tanto no puede evaluarse individualmente su recuperación'],
+a:2,cite:'NIC 36, párrafos 124-125',
+ex:'NIC 36, párrafos 124-125: el deterioro del goodwill es IRREVERSIBLE. La razón técnica es conceptual: si el importe recuperable de la UGE sube después del deterioro, ese incremento refleja generación de NUEVA plusvalía interna (nuevas relaciones con clientes, nueva organización, nuevas sinergias), no la recuperación del goodwill que se deterioró. La NIC 38 prohíbe el reconocimiento de plusvalía generada internamente. Por tanto, permitir la reversión del deterioro del goodwill equivaldría a reconocer indirectamente plusvalía interna, lo cual está expresamente prohibido.'},
+
+{blk:'c',norm:'NIC 16 / NIC 2',topic:'Repuestos — Clasificación',trap:true,
+q:'Una empresa tiene repuestos de maquinaria: (a) repuestos de uso frecuente que se consumen en menos de un año, y (b) repuestos principales de emergencia que solo pueden usarse en esa maquinaria específica y cuya vida esperada supera el período contable. ¿Cuál es la clasificación correcta?',
+o:['Todos los repuestos son inventarios bajo NIC 2, independientemente de su naturaleza y uso','Los repuestos frecuentes son inventarios (NIC 2); los repuestos principales de emergencia que se usarán por más de un período y son específicos de un activo se clasifican como PPE (NIC 16)','Todos los repuestos son PPE bajo NIC 16 porque están relacionados con activos fijos','Los repuestos de emergencia se clasifican como activos intangibles por ser de uso no regular'],
+a:1,cite:'NIC 16, párrafo 8',
+ex:'NIC 16, párrafo 8: los repuestos principales y el equipo de mantenimiento permanente que la entidad espera utilizar durante más de un período contable, o que solo pueden utilizarse en relación con un activo específico, se clasifican como PPE. Los repuestos de uso frecuente de ciclo corto son INVENTARIOS bajo NIC 2. Esta distinción tiene impacto significativo: los repuestos PPE se deprecian durante su vida útil esperada; los de inventario se consumen al gasto cuando se usan. Error común: clasificar todos los repuestos como inventarios.'},
+
+// ══════════════════════════════════════════════════════════
+// BLOQUE II — TRIBUTACIÓN (13 Q)
+// ══════════════════════════════════════════════════════════
+{blk:'t',norm:'LORTI Art. 10 num. 3',topic:'Deducibilidad — Sueldos',trap:true,
+q:'Una empresa paga sueldos y salarios a sus empleados y desea deducirlos del IR. ¿Qué condición ADICIONAL establece el Art. 10 num. 3 de la LORTI para que los sueldos sean deducibles?',
+o:['Que los sueldos no superen tres veces el salario básico unificado por empleado','Que los contratos de trabajo estén registrados en el Ministerio del Trabajo, sin más requisitos','Que sobre dichos pagos se hayan realizado los aportes patronales al IESS. Si el empleador no ha cumplido con los aportes al IESS, los sueldos no son deducibles','Que el empleado sea residente fiscal en Ecuador durante todo el año fiscal'],
+a:2,cite:'LORTI, Art. 10 num. 9 (sueldos); condición IESS',
+ex:'La LORTI establece que para deducir sueldos, salarios y remuneraciones, el empleador debe haber cumplido con las obligaciones patronales ante el IESS. Si el empleador no ha pagado o no ha declarado los aportes al IESS sobre esas remuneraciones, los sueldos NO son deducibles. Esta condición busca incentivar el cumplimiento de obligaciones de seguridad social. Es un requisito de forma adicional al de sustento en comprobantes. Error frecuente: asumir que cualquier gasto contabilizado y con factura es automáticamente deducible.'},
+
+{blk:'t',norm:'RLORTI Art. 27',topic:'Deducibilidad — Depreciación Acelerada',trap:false,
+q:'¿En qué circunstancias permite el RLORTI aplicar depreciación acelerada en activos fijos para efectos tributarios?',
+o:['Siempre que la empresa lo solicite ante el SRI con 30 días de anticipación','Cuando los activos se usan en condiciones que impliquen desgaste mayor al normal (uso en más de un turno, condiciones extremas de clima, etc.), con autorización o bajo las condiciones del Reglamento','La depreciación acelerada no existe en el ordenamiento tributario ecuatoriano','Solo para activos con costo superior a $100.000 adquiridos en el primer año de operación de la empresa'],
+a:1,cite:'RLORTI, Art. 27',
+ex:'El RLORTI Art. 27 establece que cuando los activos sean utilizados en condiciones de desgaste mayor al normal (más de un turno diario, condiciones ambientales adversas, intensidad de uso), la depreciación puede aplicarse a tasas más altas, debiendo justificarse técnicamente. La depreciación acelerada fiscal puede generar diferencias temporarias con la depreciación contable (NIIF), que deben gestionarse en la Conciliación Tributaria. El beneficio de la aceleración es el diferimiento del pago de IR (mayor deducción en períodos tempranos).'},
+
+{blk:'t',norm:'LORTI Art. 10 num. 2',topic:'Costos de Producción Deducibles',trap:true,
+q:'Una empresa manufacturera tiene costos de producción que incluyen desperdicio anormal de materiales ($15.000) ocasionado por negligencia de operadores. ¿Este desperdicio anormal es deducible del IR?',
+o:['Sí, es un costo de producción real incurrido en el proceso productivo','Sí, porque tiene respaldo en los registros de producción y kárdex','No, el desperdicio anormal no es un costo necesario para obtener los ingresos gravados. Tampoco sería parte del costo del inventario bajo NIC 2. Por doble vía no es deducible','Sí, si la empresa tiene un informe técnico que justifique las causas del desperdicio'],
+a:2,cite:'LORTI Art. 10 (necesariedad); NIC 2, párrafo 16',
+ex:'Por doble vía: (1) LORTI Art. 10 exige que el gasto sea NECESARIO para obtener ingresos. El desperdicio por negligencia no es necesario — es evitable. (2) NIC 2, párrafo 16 establece que los desperdicios ANORMALES de materiales NO forman parte del costo del inventario y deben reconocerse como gasto del período. Si el gasto ya fue contabilizado como gasto (no como costo del inventario), igual no sería deducible fiscalmente al no ser necesario para la obtención de ingresos. El desperdicio NORMAL sí puede ser parte del costo y deducible.'},
+
+{blk:'t',norm:'LORTI Art. 48',topic:'Retención a No Residentes',trap:false,
+q:'Una empresa ecuatoriana paga honorarios de $50.000 a una persona natural no residente por servicios de consultoría prestados en Ecuador. ¿Cuál es la retención en la fuente aplicable?',
+o:['2%, misma tasa que para residentes en Ecuador','10%, tasa estándar para honorarios profesionales','La empresa debe retener el 25% (tarifa del IR para sociedades) sobre el total del pago, ya que no se puede verificar la carga impositiva del no residente','25% sobre el pago bruto o la tarifa vigente para rentas del exterior según la LORTI; para servicios prestados en Ecuador por no residentes se retiene la tarifa máxima de IR'],
+a:3,cite:'LORTI, Art. 48; RLORTI Art. 92',
+ex:'LORTI Art. 48: cuando se efectúen pagos al exterior a personas naturales no residentes y no domiciliadas en Ecuador por conceptos que constituyan renta de fuente ecuatoriana, se retendrá la tarifa máxima del impuesto a la renta (25% para personas naturales en la tabla, o la tarifa aplicable). Para servicios prestados en Ecuador por no residentes, la retención asciende a la tarifa máxima sobre el total. Esto es significativamente mayor que las retenciones para residentes (2%, 8%, 10%) y busca asegurar el cobro del IR dado que el no residente podría no presentar declaración.'},
+
+{blk:'t',norm:'LORTI Art. 9 num. 1',topic:'Dividendos — Exención',trap:true,
+q:'Una sociedad anónima ecuatoriana "A" recibe dividendos de su subsidiaria ecuatoriana "B". ¿Estos dividendos están exentos del IR para la sociedad A?',
+o:['No, todos los dividendos son ingreso gravado para quien los recibe','Sí, los dividendos distribuidos por sociedades nacionales están exentos del IR cuando son recibidos por otras sociedades, para evitar la doble imposición económica dentro del mismo país','Sí, pero solo si la sociedad A posee más del 50% de B','Solo están exentos si se reinvierten en el capital de la sociedad A dentro de los 3 años siguientes'],
+a:1,cite:'LORTI, Art. 9 num. 1',
+ex:'LORTI Art. 9 num. 1: están exentos del IR los dividendos y utilidades calculados después del pago del IR, distribuidos por sociedades nacionales o extranjeras residentes en Ecuador, a favor de otras sociedades nacionales o personas naturales residentes en Ecuador. El objetivo es evitar la doble imposición económica (la utilidad ya tributó en la sociedad distribuidora). Para personas naturales, la exención aplica con condiciones específicas sobre la tarifa efectiva y el crédito tributario del IR corporativo.'},
+
+{blk:'t',norm:'LORTI Art. 28 / RLORTI',topic:'Límite Gastos de Viaje',trap:false,
+q:'Una empresa envía a sus ejecutivos al exterior en viajes de negocios. Los gastos de viaje y estadía totalizan $30.000. Los ingresos gravados del ejercicio son $3.000.000. ¿Cuánto es deducible?',
+o:['$30.000 completos, si están sustentados con comprobantes válidos','Solo $6.000, equivalente al 0,2% de los ingresos gravados','$30.000 si son estrictamente necesarios para el negocio, sin límite porcentual, siempre que la liquidación de viajes esté completa','Solo los gastos con factura del exterior, no los gastos diarios en efectivo'],
+a:0,cite:'RLORTI, Art. 34 num. 6',
+ex:'Los gastos de viaje y estadía en el exterior para actividades del negocio son deducibles en su TOTALIDAD (100%), siempre que: (1) sean necesarios para la actividad generadora de ingresos, (2) estén debidamente sustentados con comprobantes válidos, y (3) exista liquidación de viajes aprobada. A diferencia de los gastos de gestión (2% del ingreso) o publicidad (límites específicos), los gastos de viaje de negocios no tienen límite porcentual en la RLORTI. Esta es una distinción que confunde frecuentemente con los gastos de representación.'},
+
+{blk:'t',norm:'LORTI Art. 10 num. 15',topic:'Deducción por Incremento Neto de Empleados',trap:false,
+q:'¿En qué consiste el beneficio tributario por "Incremento Neto de Empleados" que contempla el Art. 10 de la LORTI?',
+o:['Las empresas pueden deducir el 100% del costo de los sueldos de empleados nuevos','Las empresas pueden deducir el 150% de las remuneraciones pagadas a los nuevos empleados contratados (incremento neto respecto al año anterior), bajo condiciones específicas, como incentivo a la generación de empleo','Las empresas no pagan IR por los primeros 5 años si contratan más de 10 empleados nuevos','El beneficio aplica solo para contratación de personas con discapacidad'],
+a:1,cite:'LORTI, Art. 10 num. 9; Incentivos de empleo',
+ex:'La LORTI contempla como deducción adicional el 150% de las remuneraciones y beneficios sociales pagados a nuevos empleados que generen un INCREMENTO NETO en la nómina (más empleados que el año anterior). Condiciones: contratos nuevos, a tiempo completo, que no sean reemplazos, y que el empleado haya estado en el sector privado. Para empleados con discapacidad, el beneficio puede ser aún mayor (hasta 150% o 160%). Este es un incentivo tributario para la generación de empleo formal que reduce la base imponible más allá del gasto real.'},
+
+{blk:'t',norm:'LORTI Art. 2 / Art. 8',topic:'Fuente Ecuatoriana — Concepto',trap:true,
+q:'Una persona natural residente en Ecuador presta servicios de consultoría a una empresa domiciliada en Colombia, realizando el trabajo íntegramente desde su oficina en Quito. ¿Los honorarios recibidos son ingresos de fuente ecuatoriana?',
+o:['No, porque el cliente es colombiano y el pago viene del exterior','No, porque el contrato se firmó en Colombia','Sí, son ingresos de fuente ecuatoriana porque la actividad generadora (el trabajo de consultoría) se realiza en territorio ecuatoriano, independientemente del domicilio del pagador','Solo si el pago se realiza en una cuenta bancaria ecuatoriana'],
+a:2,cite:'LORTI, Art. 8 num. 1',
+ex:'LORTI Art. 8 num. 1: son ingresos de fuente ecuatoriana los provenientes de actividades económicas realizadas en Ecuador. El criterio determinante es DÓNDE se realiza la actividad, no dónde está el pagador ni dónde se firma el contrato. Si el consultor trabaja físicamente en Quito, su ingreso es de fuente ecuatoriana aunque el cliente sea extranjero y el pago venga del exterior. Por tanto, debe declararse en Ecuador. Este principio de "fuente" es diferente al de "residencia" que aplican otros países.'},
+
+{blk:'t',norm:'LORTI Art. 101 / RLORTI',topic:'Obligación de Llevar Contabilidad',trap:false,
+q:'¿Cuándo está obligada una persona natural a llevar contabilidad según la LORTI?',
+o:['Todas las personas naturales que realicen actividades económicas, sin excepción','Solo las personas naturales que sean agentes de retención','Cuando sus ingresos brutos del año anterior superen los $300.000, o su capital propio al inicio de la actividad sea mayor a $180.000, o sus costos y gastos sean superiores a $240.000','Solo cuando estén registradas en el Registro Único de Contribuyentes como personas naturales obligadas a llevar contabilidad desde el inicio de actividades'],
+a:2,cite:'RLORTI, Art. 37 (umbrales); LORTI Art. 19-20',
+ex:'LORTI Art. 19 y RLORTI Art. 37: las personas naturales están OBLIGADAS a llevar contabilidad cuando en el año anterior superan cualquiera de estos umbrales: (1) Ingresos brutos > $300.000, (2) Capital propio al inicio de actividades > $180.000, (3) Costos y gastos > $240.000. Quienes no superan estos umbrales pueden llevar un registro de ingresos y gastos simplificado. La obligación de contabilidad impone también obligación de presentar estados financieros y cumplir normas contables (NIIF para PYMES o NIIF completas según el caso).'},
+
+{blk:'t',norm:'LORTI — Conciliación',topic:'Diferencias Temporarias',trap:true,
+q:'Una empresa provisiona contablemente $50.000 por garantías de productos vendidos (bajo NIC 37). Fiscalmente, las provisiones no son deducibles hasta que se realicen los desembolsos efectivos. ¿Qué genera esta diferencia?',
+o:['Una diferencia permanente que nunca se revertirá y genera un ajuste definitivo en la Conciliación Tributaria','Una diferencia temporaria DEDUCIBLE: la provisión no es deducible hoy ($50.000 se ADICIONA en la Conciliación), pero cuando se paguen las garantías efectivas, ese gasto SÍ será deducible fiscalmente. Se reconoce un Activo por Impuesto Diferido (NIC 12)','Una diferencia temporaria imponible que genera un Pasivo por Impuesto Diferido','No genera ningún impuesto diferido porque las provisiones nunca son deducibles en Ecuador'],
+a:1,cite:'LORTI Art. 10; NIC 12, párrafos 24-33',
+ex:'Esta es una DIFERENCIA TEMPORARIA DEDUCIBLE: la provisión reduce la utilidad contable ahora ($50.000 de gasto reconocido), pero no reduce la base imponible fiscal (debe ADICIONARSE en la Conciliación). En el futuro, cuando se paguen las garantías, ese desembolso SÍ será deducible fiscalmente (diferencia que se revierte). NIC 12 exige reconocer un ACTIVO POR IMPUESTO DIFERIDO = $50.000 × 25% = $12.500, que representa el ahorro fiscal futuro. Diferencia permanente (ej: multas) vs. temporaria (ej: provisiones, depreciación) es una distinción fundamental.'},
+
+{blk:'t',norm:'LORTI Art. 21',topic:'Precios de Transferencia',trap:false,
+q:'¿Cuándo están obligadas las empresas ecuatorianas a aplicar la normativa de Precios de Transferencia?',
+o:['Cuando realizan cualquier operación con empresas del mismo grupo económico','Cuando realizan operaciones con partes relacionadas o con residentes en paraísos fiscales, y cuando superen los umbrales de operaciones establecidos por el SRI','Solo cuando realizan exportaciones a empresas vinculadas del exterior','Solo empresas del sector financiero y asegurador están sujetas a Precios de Transferencia'],
+a:1,cite:'LORTI, Art. 15 y 22; RLORTI, Art. 84-92',
+ex:'LORTI Arts. 15, 21-22: las normas de Precios de Transferencia (PT) aplican a operaciones realizadas entre PARTES RELACIONADAS (nacionales y del exterior) y con residentes en paraísos fiscales. El principio rector es el "Arm\'s Length" (precio de plena competencia): las operaciones deben realizarse en condiciones equivalentes a las que se darían entre partes independientes. Cuando los precios internos difieren del mercado, el SRI puede ajustar la base imponible. Las empresas con operaciones significativas con vinculadas deben presentar el Informe Integral de Precios de Transferencia.'},
+
+{blk:'t',norm:'LORTI Art. 41',topic:'Anticipo IR — Crédito Tributario',trap:true,
+q:'Una empresa calculó un anticipo de IR de $80.000 y lo pagó en dos cuotas. Al liquidar el IR del ejercicio, el IR causado es $60.000. ¿Qué ocurre con el exceso de $20.000?',
+o:['Se pierde; el anticipo en exceso no es reembolsable','Se aplica automáticamente como crédito para el anticipo del siguiente año','Puede solicitarse como devolución de pago indebido al SRI, o aplicarse como crédito tributario para el siguiente ejercicio. El contribuyente tiene esa opción','El exceso se convierte en un crédito tributario que se mantiene en la cuenta del contribuyente indefinidamente sin posibilidad de devolución'],
+a:2,cite:'LORTI, Art. 41 num. 2 lit. j)',
+ex:'LORTI Art. 41 num. 2 lit. j): cuando el anticipo pagado supera el IR causado en el ejercicio, el contribuyente tiene derecho a: (1) solicitar la DEVOLUCIÓN del exceso como pago indebido al SRI (con los requisitos del Código Tributario), o (2) aplicarlo como CRÉDITO TRIBUTARIO para el siguiente ejercicio. No se pierde y no es de aplicación automática — requiere la elección del contribuyente. La trampa clásica es pensar que "se pierde" el exceso, lo cual es incorrecto.'},
+
+// ══════════════════════════════════════════════════════════
+// BLOQUE III — AUDITORÍA FINANCIERA (13 Q)
+// ══════════════════════════════════════════════════════════
+{blk:'af',norm:'NIA 210',topic:'Acuerdo de Términos del Encargo',trap:false,
+q:'¿Qué documento formaliza los términos del encargo de auditoría entre el auditor y el cliente, y qué debe contener según la NIA 210?',
+o:['El contrato de prestación de servicios regulado por el Código Civil, sin requisitos específicos de la NIA','La Carta de Encargo (o contrato de auditoría), que debe incluir objetivo y alcance de la auditoría, responsabilidades de la gerencia, responsabilidades del auditor, referencia al marco de información financiera aplicable y forma del informe','El memorando de planificación de auditoría elaborado internamente por el equipo auditor','El informe de control interno preliminar entregado al comité de auditoría'],
+a:1,cite:'NIA 210, párrafos 10-11',
+ex:'NIA 210, párrafo 10: el auditor acordará los términos del encargo con la gerencia o responsables del gobierno corporativo, según corresponda. La Carta de Encargo (engagement letter) documenta y confirma: (a) objetivo y alcance de la auditoría, (b) responsabilidades del auditor, (c) responsabilidades de la dirección (preparación de EEFF bajo marco aplicable, CI, información), (d) identificación del marco de información financiera, y (e) referencia a la forma esperada de cualquier comunicación. Protege tanto al auditor como al cliente al delimitar claramente el encargo.'},
+
+{blk:'af',norm:'NIA 260',topic:'Comunicación con Gobierno Corporativo',trap:false,
+q:'¿Qué materias debe comunicar el auditor a los responsables del gobierno corporativo (directorio/comité de auditoría) según la NIA 260?',
+o:['Únicamente el informe final de auditoría cuando esté listo','Solo las deficiencias de control interno significativas identificadas','La responsabilidad del auditor respecto a la auditoría, el alcance y calendario planificado, hallazgos significativos (juicios sobre áreas clave, dificultades en la auditoría, asuntos del personal clave), y la independencia del auditor','Solo los ajustes de auditoría propuestos que la dirección no ha corregido'],
+a:2,cite:'NIA 260, párrafos 15-17',
+ex:'NIA 260 establece comunicación bidireccional entre el auditor y el gobierno corporativo. Las materias a comunicar incluyen: (a) responsabilidades del auditor en la auditoría de EEFF, (b) alcance y calendario planeado, (c) hallazgos significativos (juicios sobre áreas críticas de estimación contable, dificultades encontradas, asuntos del personal clave, correcciones no realizadas, deficiencias de CI, independencia del auditor). Esta comunicación puede hacerse durante y al final de la auditoría. La NIA 260 no limita la comunicación solo al informe final; es un proceso continuo.'},
+
+{blk:'af',norm:'NIA 402',topic:'Organizaciones de Servicios',trap:false,
+q:'Un banco terceriza su procesamiento de transacciones a una empresa de tecnología financiera. El auditor del banco evalúa el control interno. ¿Qué debe considerar respecto a los controles de esa empresa de tecnología?',
+o:['El auditor no tiene responsabilidad sobre los controles de empresas externas; solo audita lo que está dentro del banco','El auditor debe evaluar los controles de la organización de servicios porque afectan el control interno del banco. Puede obtener evidencia revisando el informe de un auditor de esa organización (informe tipo SOC 1 / ISAE 3402) o realizando sus propios procedimientos','El banco debe terminar el contrato de tercerización antes de la auditoría','La NIA 402 no aplica a servicios de tecnología, solo a servicios financieros externalizados'],
+a:1,cite:'NIA 402, párrafos 8-12',
+ex:'NIA 402: cuando una entidad usa una organización de servicios para procesar transacciones, los controles de esa organización forman parte del ambiente de control interno del cliente. El auditor debe entender cómo esos controles externos afectan los riesgos de incorrección material del cliente. Las opciones para obtener evidencia incluyen: (1) revisión del informe del auditor de la organización de servicios (SOC 1 Tipo II / ISAE 3402) que describe y prueba los controles, o (2) visita directa a la organización de servicios para probar controles. No puede ignorarse la tercerización.'},
+
+{blk:'af',norm:'NIA 540',topic:'Estimaciones Contables',trap:true,
+q:'Al auditar la provisión por deterioro de cartera bajo NIIF 9 (modelo PCE), el auditor identifica que la gerencia usó tasas de incumplimiento históricas sin ajuste por condiciones macroeconómicas futuras. ¿Cuál es la implicación para el auditor?',
+o:['Las tasas históricas son suficientes; la NIA 540 no requiere información prospectiva','Es un error de presentación pero no de medición; no requiere ajuste','Es una posible incorrección material: el modelo PCE de NIIF 9 REQUIERE incorporar información prospectiva (forward-looking). El auditor debe evaluar si la omisión de ajustes macroeconómicos subestima la provisión, y si es material, proponer un ajuste','Solo sería incorrección si el SRI lo observa en la revisión tributaria de la provisión'],
+a:2,cite:'NIA 540, párrafos 12-18; NIIF 9, párrafo 5.5.17',
+ex:'NIA 540 (revisada): el auditor debe evaluar si el método de la gerencia para desarrollar estimaciones contables es apropiado, incluyendo si los supuestos son razonables. Para la PCE bajo NIIF 9, el párrafo 5.5.17 EXIGE información razonable y sustentable sobre condiciones futuras (forward-looking). Usar solo tasas históricas sin ajuste prospectivo viola la norma contable. El auditor debe: evaluar la razonabilidad del modelo, comparar con benchmarks del sector, y si la omisión es material, la provisión está subvaluada → incorrección material que requiere ajuste o, si no se ajusta, modificación de la opinión.'},
+
+{blk:'af',norm:'NIA 550',topic:'Partes Relacionadas',trap:false,
+q:'¿Por qué las transacciones con partes relacionadas representan un riesgo especial en auditoría?',
+o:['Porque siempre implican fraude o manipulación de resultados','Porque legalmente están prohibidas en muchos sectores regulados','Porque pueden no realizarse en condiciones de mercado (arm\'s length), lo que podría distorsionar los estados financieros. Además, pueden no estar adecuadamente reveladas según las normas contables (NIC 24), generando riesgo de incorrección material por omisión','Solo porque la NIA 550 las clasifica como áreas de alto riesgo de manera automática'],
+a:2,cite:'NIA 550, párrafos 3-9',
+ex:'NIA 550, párrafos 3-9: las partes relacionadas implican riesgo porque: (1) las transacciones pueden no reflejar condiciones de mercado (un préstamo sin interés entre relacionadas distorsiona gastos financieros y patrimonio), (2) pueden no revelarse adecuadamente o no revelarse en absoluto (NIC 24 exige revelación completa), (3) pueden estructurarse para lograr objetivos contables o tributarios específicos. El auditor debe entender las relaciones y transacciones con partes relacionadas para evaluar si están correctamente reflejadas y reveladas en los EEFF. No son automáticamente fraudulentas, pero requieren escrutinio especial.'},
+
+{blk:'af',norm:'NIA 700/705',topic:'Dictamen — Tipos de Opinión',trap:true,
+q:'El auditor no puede obtener evidencia suficiente y apropiada sobre el saldo de inventarios ($500.000) que representa el 15% del total de activos ($3.300.000), porque la empresa no realizó conteo físico y los registros de kardex son poco confiables. ¿Qué opinión emite?',
+o:['Opinión adversa, porque no puede confirmar la existencia del inventario','Opinión limpia, emitiendo un párrafo de énfasis sobre la limitación','Opinión con salvedades por limitación al alcance: la incapacidad de obtener evidencia suficiente sobre un saldo material (15% de activos) pero no generalizado justifica una salvedad, no abstención ni opinión adversa','Abstención de opinión, porque la limitación es sobre un saldo material'],
+a:2,cite:'NIA 705, párrafos 7, 9, 17',
+ex:'NIA 705: decisión de tipo de opinión por limitación al alcance: ¿Es el efecto MATERIAL? Sí (15% de activos es material). ¿Es GENERALIZADO (afecta múltiples saldos y distorsiona la imagen global)? No (solo afecta inventarios, un saldo específico). Resultado: OPINIÓN CON SALVEDADES (excepción) por limitación al alcance, describiendo la incapacidad de obtener evidencia sobre inventarios. Si fuera material Y generalizado → abstención. La opinión adversa aplica a incorrecciones materiales y generalizadas (cuando el auditor SÍ tiene la evidencia pero los EEFF están mal). La trampa clásica: confundir limitación al alcance (no pudo obtener evidencia) con incorrección (obtuvo evidencia y hay error).'},
+
+{blk:'af',norm:'NIA 600',topic:'Auditoría de Grupos',trap:false,
+q:'En la auditoría de un grupo empresarial, ¿cuál es la responsabilidad del auditor del grupo respecto al trabajo del auditor del componente (subsidiaria)?',
+o:['El auditor del grupo y el del componente tienen responsabilidad compartida e independiente; el informe del componente habla por sí solo','El auditor del grupo puede simplemente adjuntar el informe del auditor del componente sin más revisión','El auditor del grupo es el ÚNICO responsable de la opinión sobre los estados financieros consolidados. Debe supervisar, revisar y obtener suficiente evidencia sobre el trabajo del auditor del componente para sustentar la opinión de grupo','El auditor del grupo es responsable solo de los componentes que él auditó directamente'],
+a:2,cite:'NIA 600, párrafos 11-12 y 41',
+ex:'NIA 600, párrafo 11: el auditor del grupo es el responsable ÚNICO de la opinión de auditoría sobre los estados financieros del grupo. No puede simplemente "confiar" en el trabajo del auditor del componente sin supervisión. Debe: (a) entender al auditor del componente (competencia, independencia), (b) comunicarse con él estableciendo requerimientos, (c) revisar el trabajo realizado y los papeles de trabajo relevantes, y (d) determinar si la evidencia del componente es suficiente para sustentar la opinión de grupo. La responsabilidad no se divide; es integral del auditor principal.'},
+
+{blk:'af',norm:'COSO 2013',topic:'COSO — Principios del Entorno de Control',trap:false,
+q:'¿Cuántos principios establece el Marco COSO 2013 en total para los cinco componentes del control interno?',
+o:['5 principios, uno por cada componente','10 principios, dos por cada componente','17 principios distribuidos entre los cinco componentes, que determinan si el control interno es efectivo','25 principios, cinco por cada componente'],
+a:2,cite:'Marco COSO 2013 — Principios',
+ex:'El Marco COSO 2013 establece 17 PRINCIPIOS distribuidos: Entorno de Control (5 principios: integridad, estructura de supervisión, autoridad y responsabilidad, compromiso con competencia, rendición de cuentas), Evaluación de Riesgos (4 principios), Actividades de Control (3 principios), Información y Comunicación (3 principios), Supervisión (2 principios). Para que el control interno sea EFECTIVO, los 5 componentes deben estar presentes y funcionando, y los 17 principios deben estar presentes y en funcionamiento. Esta arquitectura específica distingue COSO 2013 del marco original de 1992.'},
+
+{blk:'af',norm:'NIA 520',topic:'Procedimientos Analíticos',trap:true,
+q:'El auditor compara el margen bruto del año actual (18%) con el del año anterior (35%). La diferencia es significativa. ¿Qué acción debe tomar según la NIA 520?',
+o:['Emitir inmediatamente una opinión con salvedades por la caída del margen','Documentar la variación y pasar a la siguiente cuenta sin más procedimientos','Investigar la variación obteniendo explicaciones de la gerencia y corroborando con evidencia de auditoría adicional. Si la explicación no es satisfactoria o no hay evidencia corroborante, puede indicar incorrección material','Solicitar al cliente que corrija el margen al nivel del año anterior'],
+a:2,cite:'NIA 520, párrafos 7-8',
+ex:'NIA 520, párrafo 7: cuando los procedimientos analíticos identifican fluctuaciones o relaciones inconsistentes con otra información o que difieren de los valores esperados, el auditor debe: (1) pedir explicaciones a la gerencia, (2) obtener evidencia de auditoría apropiada que corrobore las explicaciones. Si la gerencia no puede explicar la variación o la explicación no está sustentada en evidencia, la variación puede ser un indicador de incorrección material (ej: sobrevaluación de ingresos, subvaluación de costos) que requiere procedimientos adicionales de detalle. La variación de margen bruto de 35% a 18% es una señal de alerta significativa.'},
+
+{blk:'af',norm:'NIA 230',topic:'Documentación — Papeles de Trabajo',trap:false,
+q:'¿Cuál es el propósito principal de la documentación de auditoría (papeles de trabajo) según la NIA 230?',
+o:['Demostrar al cliente que el auditor realizó muchas horas de trabajo','Cumplir un requisito formal de las normas sin valor técnico práctico','Proporcionar evidencia de la base para la conclusión del auditor, y evidencia de que la auditoría fue planificada y realizada de acuerdo con las NIA y requisitos legales y regulatorios aplicables','Registrar únicamente los hallazgos negativos y las incorrecciones detectadas'],
+a:2,cite:'NIA 230, párrafo 2',
+ex:'NIA 230, párrafo 2: la documentación de auditoría cumple varios propósitos: (1) BASE para la conclusión del auditor sobre los objetivos globales, (2) EVIDENCIA de que la auditoría fue planificada y ejecutada conforme a NIA, (3) facilita la supervisión y revisión del trabajo del equipo, (4) permite la revisión de control de calidad, (5) permite la inspección por organismos reguladores. La documentación debe ser suficientemente completa y detallada para que un auditor experimentado, sin conocimiento previo del encargo, pueda entender la naturaleza, oportunidad y alcance de los procedimientos realizados y sus conclusiones.'},
+
+// ══════════════════════════════════════════════════════════
+// BLOQUE IV — AUDITORÍA DE GESTIÓN (12 Q)
+// ══════════════════════════════════════════════════════════
+{blk:'ag',norm:'Manual CGE',topic:'Auditoría de Gestión — Objetivo',trap:false,
+q:'¿Cuál es el objeto de examen en una Auditoría de Gestión según el Manual de la CGE?',
+o:['Los estados financieros y su razonabilidad frente a las NIIF vigentes','Los controles internos de la entidad para emitir un informe de control interno','La gestión organizacional en sus componentes: planificación, organización, dirección y control, evaluando el uso de recursos con criterios de economía, eficiencia, eficacia, ética y ecología','El cumplimiento de obligaciones tributarias y laborales de la entidad pública'],
+a:2,cite:'Manual de Auditoría de Gestión CGE, Capítulo I',
+ex:'El Manual de Auditoría de Gestión define el objeto como la gestión de la entidad, evaluada en sus cuatro funciones administrativas: Planificación (¿tiene objetivos claros?), Organización (¿estructura adecuada?), Dirección (¿liderazgo efectivo?) y Control (¿mecanismos de seguimiento?). La evaluación se realiza bajo los criterios de las 5 E: Economía, Eficiencia, Eficacia, Ética y Ecología. El resultado no es una "opinión" sino conclusiones y recomendaciones para mejorar la gestión institucional.'},
+
+{blk:'ag',norm:'Manual CGE — Fase I',topic:'Visita Preliminar',trap:false,
+q:'En la Fase I de Conocimiento Preliminar, el auditor realiza una "visita de observación a las instalaciones". ¿Cuál es el objetivo específico de esta visita?',
+o:['Verificar el estado físico de los activos fijos e inventarios como parte de las pruebas de auditoría','Establecer comunicación formal con el nivel directivo para acordar las fechas del trabajo de campo','Obtener un conocimiento general de la entidad: sus actividades, procesos, instalaciones, equipos, y el ambiente donde opera, para identificar áreas críticas y orientar el alcance de la auditoría','Recopilar documentación financiera para el análisis preliminar del balance general'],
+a:2,cite:'Manual de Auditoría de Gestión CGE, Fase I',
+ex:'La visita de observación preliminar tiene un propósito de RECONOCIMIENTO general: el auditor observa las instalaciones, equipos, flujo de operaciones, condiciones de trabajo y el entorno físico. Esto permite: (a) entender la naturaleza de las operaciones, (b) identificar áreas potencialmente problemáticas (instalaciones deterioradas, procesos informales, recursos subutilizados), (c) seleccionar los componentes prioritarios para la auditoría. No es una prueba de auditoría formal ni una inspección de activos; es una herramienta de orientación para la planificación.'},
+
+{blk:'ag',norm:'Manual CGE — Fase I',topic:'FODA en Auditoría de Gestión',trap:false,
+q:'¿Para qué utiliza el auditor de gestión el análisis FODA (Fortalezas, Oportunidades, Debilidades, Amenazas) durante la Fase I?',
+o:['Para elaborar el plan estratégico de la entidad auditada y recomendar cambios','Para calcular los indicadores de eficiencia y eficacia de la entidad','Para obtener una visión integral del ambiente interno (fortalezas y debilidades) y externo (oportunidades y amenazas) de la entidad, identificando áreas críticas de gestión que guiarán el enfoque y alcance de la auditoría','Solo cuando la entidad no tiene plan estratégico propio'],
+a:2,cite:'Manual de Auditoría de Gestión CGE, Fase I — Análisis FODA',
+ex:'En la Fase I, el FODA es una herramienta de DIAGNÓSTICO organizacional, no de planificación estratégica. El auditor usa el FODA para: (a) identificar áreas donde la gestión puede ser deficiente (debilidades internas), (b) reconocer amenazas externas que afectan el desempeño, (c) evaluar si la entidad aprovecha sus fortalezas y oportunidades. El resultado orienta la selección de componentes a examinar en profundidad durante la auditoría. Es una herramienta de análisis situacional, no de elaboración de estrategia.'},
+
+{blk:'ag',norm:'Manual CGE — Fase II',topic:'Evaluación de Control Interno',trap:true,
+q:'En la Fase II de Planificación, el auditor evalúa el control interno de la entidad. ¿Cuál es el propósito de esta evaluación en el contexto de auditoría de gestión?',
+o:['Emitir un dictamen formal sobre la efectividad del control interno, similar a un informe bajo NIA 265','Determinar la responsabilidad de los funcionarios por las deficiencias encontradas','Comprender los mecanismos de control existentes para evaluar los riesgos de gestión, determinar la confianza depositada en el sistema de control, y orientar la naturaleza, alcance y profundidad de los procedimientos de auditoría a aplicar en la Fase III','Reemplazar las pruebas de cumplimiento y pruebas sustantivas de la auditoría financiera'],
+a:2,cite:'Manual de Auditoría de Gestión CGE, Fase II — Control Interno',
+ex:'En auditoría de gestión, la evaluación del CI cumple una función orientadora: NO produce un dictamen formal de CI (ese es objetivo de compromisos específicos de CI bajo ISAE 3000). Su propósito es: (a) entender cómo la entidad controla sus procesos operativos y administrativos, (b) evaluar el riesgo de que las deficiencias de CI generen ineficiencias, desperdicios o incumplimiento de objetivos, (c) determinar cuánta confianza depositar en los controles vs. cuánto trabajo sustantivo realizar en la Fase III. La evaluación de CI es un insumo para el diseño del programa de trabajo, no un fin en sí mismo.'},
+
+{blk:'ag',norm:'Manual CGE — Fase III',topic:'Papeles de Trabajo en Gestión',trap:false,
+q:'¿Cuál es la diferencia entre los papeles de trabajo del "archivo corriente" y el "archivo permanente" en auditoría de gestión?',
+o:['No hay diferencia; todos los papeles de trabajo se archivan juntos por fecha','El archivo permanente solo existe en auditoría financiera, no en gestión','El archivo permanente contiene información de uso continuo y relativamente invariable entre auditorías (leyes, estatutos, organigramas, contratos). El archivo corriente contiene la documentación específica del encargo en curso: programas, cuestionarios aplicados, hallazgos, evidencia recolectada y papeles de trabajo del período bajo examen','El archivo corriente se destruye al terminar la auditoría; el permanente se conserva indefinidamente'],
+a:2,cite:'Manual de Auditoría de Gestión CGE — Organización de Papeles de Trabajo',
+ex:'ARCHIVO PERMANENTE: información de referencia continua — base legal, misión/visión, organigrama, manuales de procesos, contratos relevantes, informes de auditorías anteriores. Se actualiza pero no se rehace en cada encargo. ARCHIVO CORRIENTE: documentación del encargo específico — programa de trabajo, cuestionarios de CI aplicados, entrevistas, análisis de indicadores, evidencias recolectadas de hallazgos, borradores de informes. Se crea para cada encargo y se conserva según los plazos legales de custodia (generalmente 7 años). Esta distinción es fundamental para la organización eficiente del trabajo de auditoría.'},
+
+{blk:'ag',norm:'Manual CGE — Hallazgos',topic:'Atributos del Hallazgo — Causa',trap:true,
+q:'Un equipo auditor identifica que la entidad tiene un 35% de obras de infraestructura inconclusas. El auditor escribe como "causa": "Las obras están inconclusas porque no se terminaron". ¿Qué error técnico comete el auditor?',
+o:['Ninguno, la causa es factualmente correcta','El error es que debería expresar la causa en términos monetarios','La "causa" descrita es una tautología (repetición del problema, no su raíz). La causa debe identificar el POR QUÉ real: falta de supervisión técnica, incumplimiento contractual sin sanción, inadecuada planificación de plazos, ausencia de garantías de cumplimiento. Una causa deficiente lleva a recomendaciones genéricas e inefectivas','El error es que la causa debe ser un artículo de ley o norma incumplida'],
+a:2,cite:'Manual de Auditoría de Gestión CGE — Atributos del Hallazgo',
+ex:'El atributo CAUSA es el más crítico y difícil del hallazgo. Errores frecuentes: (1) TAUTOLOGÍA: decir que la causa de obras inconclusas es "no haber terminado las obras" — no agrega información. (2) SÍNTOMA: confundir el efecto con la causa. La causa real requiere investigación: ¿Faltó presupuesto? ¿Hubo incumplimiento del contratista sin penalización? ¿Falló la supervisión técnica? ¿El diseño era inadecuado? Las RECOMENDACIONES se derivan directamente de las causas: si la causa es falta de supervisión, la recomendación es implementar mecanismos de supervisión. Causa bien identificada = recomendación efectiva.'},
+
+{blk:'ag',norm:'Manual CGE — Fase IV',topic:'Estructura del Informe de Gestión',trap:false,
+q:'¿Cuál es la estructura básica del informe de Auditoría de Gestión según el Manual de la CGE?',
+o:['Opinión del auditor, notas a los estados financieros y carta a la gerencia','Solo un listado de hallazgos con su calificación de grave, moderado o leve','Carta de presentación, índice, capítulo I (información introductoria), capítulo II (resultados: hallazgos con condición, criterio, causa y efecto), capítulo III (conclusiones), capítulo IV (recomendaciones) y anexos de evidencia','Un formulario estandarizado del SRI con las irregularidades encontradas'],
+a:2,cite:'Manual de Auditoría de Gestión CGE, Fase IV — Estructura del Informe',
+ex:'El informe de Auditoría de Gestión de la CGE tiene estructura estandarizada: (1) Carta de presentación al titular de la entidad, (2) Índice, (3) Capítulo I — Información introductoria: antecedentes, motivo, objetivos, alcance, base legal, (4) Capítulo II — Resultados del examen: desarrollo de cada hallazgo con sus 4 atributos (CCCE), comentarios de funcionarios y criterio del auditor, (5) Capítulo III — Conclusiones: valoración global de la gestión por componente, (6) Capítulo IV — Recomendaciones: específicas, dirigidas a funcionarios concretos con responsabilidad de implementación, (7) Anexos: evidencia de soporte. Esta estructura es diferente al dictamen financiero.'},
+
+{blk:'ag',norm:'Manual CGE — Seguimiento',topic:'Fase V — Seguimiento',trap:false,
+q:'¿En qué consiste la Fase V de Seguimiento de la Auditoría de Gestión y por qué es fundamental?',
+o:['Es la revisión de los papeles de trabajo antes de archivarlos definitivamente','Es la fase en que el auditor realiza las pruebas sustantivas principales','Es la evaluación sistemática de que las recomendaciones emitidas en el informe de auditoría han sido implementadas por la entidad auditada en los plazos acordados. Sin seguimiento, la auditoría pierde su impacto real en la mejora de la gestión','Es la elaboración del informe final definitivo después de la conferencia de resultados'],
+a:2,cite:'Manual de Auditoría de Gestión CGE, Fase V',
+ex:'La Fase V de Seguimiento cierra el ciclo de la auditoría de gestión. Su propósito: verificar que las RECOMENDACIONES hayan sido efectivamente implementadas. Proceso: (a) la entidad elabora un plan de implementación de recomendaciones con responsables y plazos, (b) el equipo auditor (o la unidad de auditoría interna) verifica el cumplimiento periódicamente, (c) las recomendaciones no implementadas se escalan al nivel jerárquico superior o se incluyen en la siguiente auditoría como hallazgo recurrente. Sin seguimiento, la auditoría es un ejercicio académico: identifica problemas pero no genera mejora real. En el sector público ecuatoriano, el incumplimiento de recomendaciones puede generar responsabilidades administrativas.'},
+
+{blk:'ag',norm:'Manual CGE',topic:'Evidencia en Auditoría de Gestión',trap:true,
+q:'¿Cuáles son los tipos de evidencia que el auditor de gestión puede utilizar, y cuál tiene MAYOR grado de confiabilidad?',
+o:['Solo evidencia documental y testimonial; la evidencia física no es válida en gestión','Física, testimonial, documental y analítica. La evidencia FÍSICA (observación directa, inspección) tiene el mayor grado de confiabilidad porque el auditor la obtiene directamente sin intermediación','Testimonial es la más confiable porque proviene de funcionarios que conocen la entidad','Solo la evidencia analítica es válida en auditoría de gestión'],
+a:1,cite:'Manual de Auditoría de Gestión CGE — Tipos de Evidencia',
+ex:'Los tipos de evidencia en auditoría de gestión son: (1) FÍSICA: obtenida por observación directa o inspección del auditor (visita a instalaciones, verificación de equipos). Es la más confiable porque el auditor la obtiene directamente. (2) DOCUMENTAL: contratos, actas, informes, registros — muy confiable si son documentos externos. (3) TESTIMONIAL: declaraciones verbales o escritas de funcionarios — menor confiabilidad, requiere corroboración. (4) ANALÍTICA: cálculos, comparaciones, indicadores — confiable si los datos fuente son confiables. La jerarquía: Física > Documental externa > Documental interna verificada externamente > Analítica > Testimonial.'},
+
+];
+
+// ════════════════════════════════
+const BLKS={
+  c:{name:'Contabilidad Financiera',icon:'📊',s:0,e:11},
+  t:{name:'Tributación',icon:'⚖️',s:12,e:24},
+  af:{name:'Auditoría Financiera',icon:'🔍',s:25,e:37},
+  ag:{name:'Auditoría de Gestión',icon:'📋',s:38,e:49},
+};
+const BC={c:'var(--c)',t:'var(--t)',af:'var(--af)',ag:'var(--ag)'};
+
+let cur=0,ans=new Array(QS.length).fill(null),secs=75*60,ti=null,done=false;
+
+function startTimer(){
+  ti=setInterval(()=>{
+    secs--;
+    const m=String(Math.floor(secs/60)).padStart(2,'0'),s=String(secs%60).padStart(2,'0');
+    document.getElementById('ttxt').textContent=`${m}:${s}`;
+    const b=document.getElementById('tmr');b.className='tmr';
+    if(secs<=300)b.classList.add('danger');else if(secs<=900)b.classList.add('warn');
+    if(secs<=0){clearInterval(ti);doFin();}
+  },1000);
+}
+
+function buildNav(){
+  const sn=document.getElementById('sn');sn.innerHTML='';
+  Object.entries(BLKS).forEach(([k,bl])=>{
+    const d=document.createElement('div');d.className='sn-blk';
+    d.innerHTML=`<div class="sn-lbl ${k}">${bl.icon} ${bl.name.split(' ')[0]}</div><div class="ng" id="ng-${k}"></div>`;
+    sn.appendChild(d);
+    const ng=d.querySelector(`#ng-${k}`);
+    QS.slice(bl.s,bl.e+1).forEach((_,qi)=>{
+      const gi=bl.s+qi,nd=document.createElement('div');
+      nd.className=`nd ${k}`+(gi===0?' now':'');nd.textContent=gi+1;nd.id=`nd-${gi}`;nd.onclick=()=>goTo(gi);
+      ng.appendChild(nd);
+    });
+  });
+}
+function updateNav(){
+  QS.forEach((_,i)=>{
+    const d=document.getElementById(`nd-${i}`);if(!d)return;
+    d.className=`nd ${QS[i].blk}`;
+    if(i===cur)d.classList.add('now');else if(ans[i]!==null)d.classList.add('done');
+  });
+}
+function updateTabs(){
+  document.querySelectorAll('.btt').forEach(b=>b.classList.remove('on'));
+  const m={c:'tab-c',t:'tab-t',af:'tab-af',ag:'tab-ag'};
+  const tb=document.getElementById(m[QS[cur].blk]);if(tb)tb.classList.add('on');
+}
+
+function render(){
+  const q=QS[cur],blk=q.blk,bl=BLKS[blk];
+  document.getElementById('qc').className=`qc ${blk}`;
+  const bb=document.getElementById('bb2');
+  bb.className=`bb2 ${blk}`;
+  bb.innerHTML=`${bl.icon} <strong>${bl.name}</strong><span class="bb-r">P.${bl.s+1}–${bl.e+1}</span>`;
+  document.getElementById('t1').textContent=`P.${String(cur+1).padStart(2,'0')}/50`;
+  document.getElementById('t2').textContent=q.norm;
+  document.getElementById('t3').textContent=q.topic;
+  const t4=document.getElementById('t4');t4.style.display=q.trap?'inline-flex':'none';
+  const t5=document.getElementById('t5');
+  if(q.caso){t5.style.display='inline-flex';document.getElementById('qcase').style.display='block';document.getElementById('qcase').innerHTML=`<b>📋 Caso:</b> ${q.caso}`;}
+  else{t5.style.display='none';document.getElementById('qcase').style.display='none';}
+  document.getElementById('qtext').textContent=q.q;
+  const L=['A','B','C','D'],c=document.getElementById('opts');
+  c.innerHTML='';
+  q.o.forEach((op,i)=>{
+    const d=document.createElement('div');
+    d.className='opt'+(ans[cur]===i?' sel':'');
+    d.innerHTML=`<span class="ol">${L[i]}</span><span>${op}</span>`;
+    if(!done)d.onclick=()=>pick(i);c.appendChild(d);
+  });
+  const fb=document.getElementById('fb');fb.className='fb';fb.textContent='';
+  document.getElementById('bp').disabled=cur===0;document.getElementById('bn2').disabled=cur===QS.length-1;
+  updateTabs();updateProg();
+}
+function pick(i){if(done)return;ans[cur]=i;render();updateNav();}
+function updateProg(){
+  const n=ans.filter(x=>x!==null).length,p=Math.round(n/QS.length*100);
+  document.getElementById('pfil').style.width=p+'%';
+  document.getElementById('plbl').textContent=`P.${cur+1}/50`;
+  document.getElementById('pcnt').textContent=`${n} resp.`;
+}
+function goTo(i){cur=i;render();updateNav();}
+function jb(i){goTo(i);}
+function nav(d){const n=cur+d;if(n>=0&&n<QS.length)goTo(n);}
+
+function startExam(){
+  document.getElementById('sw').classList.remove('active');
+  document.getElementById('se').classList.add('active');
+  buildNav();render();updateNav();startTimer();
+}
+function askEnd(){
+  const b=ans.filter(x=>x===null).length;
+  document.getElementById('mp').textContent=b>0?`Tienes ${b} sin responder. ¿Finalizar?`:'¿Confirmas finalizar?';
+  document.getElementById('mbg').classList.add('on');
+}
+function cm(){document.getElementById('mbg').classList.remove('on');}
+function doFin(){cm();clearInterval(ti);done=true;showRes();}
+function restart(){cur=0;ans=new Array(QS.length).fill(null);secs=75*60;done=false;document.getElementById('sr').classList.remove('active');document.getElementById('sw').classList.add('active');}
+
+function showRes(){
+  document.getElementById('se').classList.remove('active');
+  document.getElementById('sr').classList.add('active');window.scrollTo(0,0);
+  let ok=0,bad=0,blank=0;
+  ans.forEach((a,i)=>{if(a===null)blank++;else if(a===QS[i].a)ok++;else bad++;});
+  const pct=Math.round(ok/QS.length*100);
+  const color=pct>=70?'#22C55E':pct>=50?'#F97316':'#F43F5E';
+  const C=439.82,off=C-(pct/100)*C;
+  const rg=document.getElementById('sfg');rg.style.stroke=color;
+  setTimeout(()=>{rg.style.strokeDashoffset=off;},100);
+  document.getElementById('spc').textContent=pct+'%';document.getElementById('spc').style.color=color;
+  const msgs=[[90,'SOBRESALIENTE','Dominio completo. Estás listo para el examen real.'],[80,'MUY BUENO','Gran resultado. Repasa los errores para llegar al 90%.'],[70,'APROBADO ✓','Cumples el umbral. Refuerza los bloques con menor puntaje.'],[50,'EN PROCESO','Tienes la base. Prioriza los bloques con más errores.'],[0,'REQUIERE REFUERZO','Usa cada explicación como guía de estudio dirigido.']];
+  const[,g,m]=msgs.find(([t])=>pct>=t);
+  document.getElementById('slbl').textContent=g;
+  document.getElementById('rtt').innerHTML=pct>=70?'Examen <span class="hi">Aprobado</span>':'Examen <span class="hi">Finalizado</span>';
+  document.getElementById('rmsg').textContent=m;
+  document.getElementById('ovc').textContent=ok;document.getElementById('ovw').textContent=bad;document.getElementById('ovb').textContent=blank;
+  setTimeout(()=>{
+    document.getElementById('obc').style.width=(ok/QS.length*100)+'%';
+    document.getElementById('obw').style.width=(bad/QS.length*100)+'%';
+    document.getElementById('obb').style.width=(blank/QS.length*100)+'%';
+  },200);
+  const bsc=document.getElementById('bsc');bsc.innerHTML='';
+  Object.entries(BLKS).forEach(([k,bl])=>{
+    const bqs=QS.slice(bl.s,bl.e+1),total=bqs.length;
+    const correct=bqs.filter((_,i)=>ans[bl.s+i]===QS[bl.s+i].a).length;
+    const bp=total?Math.round(correct/total*100):0;
+    const bc=bp>=70?BC[k]:bp>=50?'#F97316':'#F43F5E';
+    const card=document.createElement('div');card.className=`bscard ${k}`;
+    const bid=`bs-${k}`;
+    card.innerHTML=`<div class="bst"><div class="bsn">${bl.icon} ${bl.name}</div><div class="bsp" style="color:${bc}">${bp}%</div></div><div class="bsb"><div class="bsbar" id="${bid}" style="background:${bc}"></div></div><div class="bsd" style="color:${bc}">${correct} de ${total} correctas</div>`;
+    bsc.appendChild(card);setTimeout(()=>{const b=document.getElementById(bid);if(b)b.style.width=bp+'%';},500);
+  });
+  const L=['A','B','C','D'],rl=document.getElementById('rvlist');rl.innerHTML='';
+  QS.forEach((q,i)=>{
+    const ua=ans[i],isOk=ua===q.a,st=isOk?'ok':'bad';
+    let opH='';q.o.forEach((op,oi)=>{let cls='dim',ic='';if(oi===q.a){cls='ok';ic='✓ ';}else if(oi===ua&&!isOk){cls='bad';ic='✗ ';}opH+=`<div class="ropt ${cls}"><span class="rl">${L[oi]}.</span><span>${ic}${op}</span></div>`;});
+    const cH=q.caso?`<div class="rcase"><b>Caso:</b> ${q.caso}</div>`:'';
+    const trapTag=q.trap?`<span class="tg trm" style="font-size:0.58rem;padding:2px 8px">⚠ Trampa</span>`:'';
+    const card=document.createElement('div');card.className=`rcard ${st}`;card.dataset.st=st;card.dataset.blk=q.blk;
+    card.innerHTML=`<div class="rm"><span class="rn">P.${String(i+1).padStart(2,'0')}</span><span class="rbadge ${st}">${isOk?'✓ CORRECTA':'✗ INCORRECTA'}</span><span class="tg nrm" style="font-size:0.58rem;padding:2px 8px">${q.norm}</span><span class="tg tpc" style="font-size:0.58rem;padding:2px 8px">${q.topic}</span>${trapTag}</div><div class="rq">${q.q}</div>${cH}<div class="ropts">${opH}</div><div class="rex"><strong>Explicación —</strong> ${q.ex}<div class="nc">📚 ${q.cite}</div></div>`;
+    rl.appendChild(card);
+  });
+}
+function flt(type,btn){
+  document.querySelectorAll('.fbb').forEach(b=>{b.className='fbb';});
+  btn.classList.add('on');if(['c','t','af','ag'].includes(type))btn.classList.add(type);
+  document.querySelectorAll('.rcard').forEach(c=>{
+    if(type==='all')c.classList.remove('gone');
+    else if(type==='ok'||type==='bad')c.classList.toggle('gone',c.dataset.st!==type);
+    else c.classList.toggle('gone',c.dataset.blk!==type);
+  });
+}
+</script>
+</body>
+</html>
